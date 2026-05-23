@@ -1,0 +1,23 @@
+DPDP Data Subject Category Map,,,,,,,,,
+By Specus Labs | CC BY 4.0 | This is not legal advice.,,,,,,,,,
+Organisation,,[ORG NAME],Last Updated,,[DATE],Reviewed By,,[NAME]
+,,,,,,,,,
+Data Subject Category,Description,Approximate Volume,Systems Where Data Held,Data Categories Held,Consent Obtained (Y/N),Consent Mechanism,Rights Request Contact Method,Special Considerations
+,,,,,,,,,
+Registered Customers,Individuals who have created an account and purchased from the business,~[number],"Shopify, Razorpay, Klaviyo, Internal DB","Name, email, phone, address, purchase history, payment records",Y,Checkout consent checkbox + privacy policy link,support@[yourdomain].com,Standard rights apply. Review erasure process across all systems.
+Guest Customers,Individuals who completed a purchase without creating an account,~[number],"Shopify, Razorpay, Shiprocket","Name, email, phone, delivery address, order details",Y (implied at checkout),Privacy policy at checkout,support@[yourdomain].com,Limited erasure possible — payment records may be under regulatory hold
+Marketing Contacts (Email),Individuals who subscribed to email marketing,~[number],"Klaviyo, email platform","Name, email, email engagement data",Y,Email opt-in form / Shopify newsletter checkbox,Unsubscribe link in emails + support@[yourdomain].com,Must honour unsubscribe immediately. Review suppression list.
+Website Visitors (Anonymous),Individuals who visited the website — tracked via analytics,~[number],"Google Analytics 4, Meta Pixel","Anonymised IP, device type, session data",N (cookie consent),Cookie banner (if implemented),N/A — anonymous data,Verify IP anonymisation in GA4. Implement cookie consent banner if not done.
+Full-Time Employees,Current and former employees of the organisation,~[number],"HR spreadsheet, payroll software, email","Name, address, PAN, Aadhaar, bank account, salary, attendance, leave",Y (employment agreement),Employment contract and onboarding forms,HR lead or founder direct contact,HIGH SENSITIVITY — PAN and Aadhaar held. Restrict access. Minimum 5-year retention post-exit for statutory compliance.
+Contractors / Freelancers,Individuals engaged on a contract or project basis,~[number],"Contract documents, email, invoices","Name, PAN, bank account, service agreement",Y (contract),Service agreement / contract,Founder or operations lead,PAN required for TDS. Retain contract and invoices for 7 years.
+Staffing Candidates,Individuals who applied for jobs but were not placed or hired,~[number],"Email, HR spreadsheet, job portal","Name, phone, email, resume, work history",Y (job application),Job application process,HR lead or founder,Review retention period — delete within 1 year if not hired and no ongoing engagement
+Vendor and Partner Contacts,Named contacts at vendor companies (B2B),~[number],"Email inbox, CRM, vendor agreements","Name, work email, work phone, job title",N (B2B — generally not required),Vendor relationship,Relevant account manager,B2B contact data — lower risk but still personal data if individually identifiable
+Support Contacts,Individuals who contacted support but may not be registered,~[number],"Intercom, WhatsApp Business, email","Name, email or phone, issue description, conversation history",Y (implied on contact),Support widget / WhatsApp initiation,support@[yourdomain].com,May overlap with registered customers. Avoid duplicate erasure gaps.
+,,,,,,,,,
+Add more rows above this line,,,,,,,,,
+,,,,,,,,,
+DPDP Act reference:,,,,,,,,,
+Section 11 — Data Principals have the right to request a summary of their personal data and processing activities.,,,,,,,,,
+Section 12 — Data Principals have the right to correction and erasure.,,,,,,,,,
+Section 9 — If any category above includes individuals under 18 add a row and flag it. Verifiable parental consent required.,,,,,,,,,
+This is not legal advice. Consult a qualified legal professional for advice specific to your organisation.,,,,,,,,,

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPDP Data Flow Diagram Builder | Specus Labs</title>
+<style>
+:root{
+  --ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;
+  --white:#fff;--amber:#d97706;--amber-light:#fffbeb;
+  --entry:#2563eb;--entry-light:#dbeafe;
+  --storage:#7c3aed;--storage-light:#ede9fe;
+  --processor:#0f766e;--processor-light:#ccfbf1;
+  --thirdparty:#b45309;--thirdparty-light:#fef3c7;
+  --deletion:#dc2626;--deletion-light:#fee2e2;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+header{background:var(--ink);color:white;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0;}
+header h1{font-size:16px;font-weight:700;}
+header p{font-size:11px;opacity:0.6;margin-left:auto;}
+.disclaimer{background:var(--amber-light);border-bottom:2px solid var(--amber);padding:7px 20px;font-size:11px;color:var(--amber);flex-shrink:0;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
+.toolbar-section{display:flex;gap:6px;align-items:center;padding-right:12px;border-right:1px solid var(--border);}
+.toolbar-section:last-child{border-right:none;margin-left:auto;}
+.toolbar label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.node-btn{padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;gap:5px;}
+.node-btn.entry{background:var(--entry-light);color:var(--entry);border-color:var(--entry);}
+.node-btn.storage{background:var(--storage-light);color:var(--storage);border-color:var(--storage);}
+.node-btn.processor{background:var(--processor-light);color:var(--processor);border-color:var(--processor);}
+.node-btn.thirdparty{background:var(--thirdparty-light);color:var(--thirdparty);border-color:var(--thirdparty);}
+.node-btn.deletion{background:var(--deletion-light);color:var(--deletion);border-color:var(--deletion);}
+.btn{padding:6px 13px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--ink);}
+.btn:hover{background:var(--border);}
+.btn-red{border-color:#fca5a5;background:#fef2f2;color:var(--deletion);}
+.canvas-wrap{flex:1;overflow:hidden;position:relative;}
+svg#canvas{width:100%;height:100%;cursor:default;}
+.node-group{cursor:grab;}
+.node-group:active{cursor:grabbing;}
+.node-rect{rx:8;ry:8;stroke-width:2.5;filter:drop-shadow(0 2px 6px rgba(0,0,0,.12));}
+.node-text{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;font-weight:700;dominant-baseline:middle;text-anchor:middle;}
+.node-subtext{font-family:'Segoe UI',system-ui,sans-serif;font-size:10px;dominant-baseline:middle;text-anchor:middle;opacity:0.75;}
+.edge-line{stroke-width:2;fill:none;marker-end:url(#arrowhead);}
+.edge-label{font-family:'Segoe UI',system-ui,sans-serif;font-size:10px;fill:#374151;dominant-baseline:middle;text-anchor:middle;}
+.edge-label-bg{fill:white;opacity:0.9;}
+.connecting{cursor:crosshair!important;}
+.selected-node rect{stroke:#f59e0b!important;stroke-width:3!important;}
+.legend{position:absolute;bottom:16px;left:16px;background:white;border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.legend h4{font-size:11px;font-weight:700;margin-bottom:8px;color:var(--ink);}
+.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:5px;color:var(--muted);}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.instructions{position:absolute;top:12px;right:16px;background:rgba(255,255,255,0.95);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:10px;color:var(--muted);max-width:220px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.instructions p{margin-bottom:4px;line-height:1.5;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:10px;padding:24px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.18);}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:16px;}
+.modal label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;}
+.modal input,.modal select,.modal textarea{width:100%;border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:13px;margin-bottom:14px;font-family:inherit;}
+.modal textarea{height:70px;resize:vertical;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
+.modal-actions .btn-primary{background:var(--ink);color:white;border:none;padding:8px 18px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;}
+.modal-actions .btn-cancel{padding:8px 16px;border-radius:5px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--bg);}
+footer{background:var(--ink);color:rgba(255,255,255,.55);padding:10px 20px;font-size:10px;display:flex;justify-content:space-between;flex-shrink:0;}
+footer a{color:rgba(255,255,255,.75);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DPDP Data Flow Diagram Builder</h1>
+  <p>Specus Labs | CC BY 4.0 | This is not legal advice</p>
+</header>
+<div class="disclaimer">⚠️ This is not legal advice. Use this visual to document data flows internally. Consult a qualified legal professional for DPDP compliance advice.</div>
+
+<div class="toolbar">
+  <div class="toolbar-section">
+    <label>Add Node</label>
+    <button class="node-btn entry" onclick="startAddNode('entry')">⬤ Entry Point</button>
+    <button class="node-btn storage" onclick="startAddNode('storage')">⬤ Storage</button>
+    <button class="node-btn processor" onclick="startAddNode('processor')">⬤ Processor</button>
+    <button class="node-btn thirdparty" onclick="startAddNode('thirdparty')">⬤ Third Party</button>
+    <button class="node-btn deletion" onclick="startAddNode('deletion')">⬤ Deletion</button>
+  </div>
+  <div class="toolbar-section">
+    <label>Connect</label>
+    <button class="btn" id="connectBtn" onclick="toggleConnect()">→ Draw Arrow</button>
+  </div>
+  <div class="toolbar-section">
+    <label>Actions</label>
+    <button class="btn" onclick="clearCanvas()">Clear All</button>
+    <button class="btn" onclick="loadExample()">Load Example</button>
+    <button class="btn" onclick="window.print()">Print / PDF</button>
+  </div>
+</div>
+
+<div class="canvas-wrap">
+  <svg id="canvas">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+      </marker>
+      <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+      </marker>
+    </defs>
+    <g id="edgesLayer"></g>
+    <g id="nodesLayer"></g>
+  </svg>
+
+  <div class="legend">
+    <h4>Node Types</h4>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--entry-light);border:2px solid var(--entry)"></div>Entry Point (data collection)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--storage-light);border:2px solid var(--storage)"></div>Storage (where data is held)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--processor-light);border:2px solid var(--processor)"></div>Processor (internal processing)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--thirdparty-light);border:2px solid var(--thirdparty)"></div>Third Party / Vendor</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--deletion-light);border:2px solid var(--deletion)"></div>Deletion endpoint</div>
+  </div>
+
+  <div class="instructions">
+    <p><strong>How to use:</strong></p>
+    <p>1. Click a node type button to add it</p>
+    <p>2. Drag nodes to position them</p>
+    <p>3. Click "Draw Arrow" then click two nodes to connect them</p>
+    <p>4. Double-click any node or arrow to edit it</p>
+    <p>5. Print / PDF to save</p>
+  </div>
+</div>
+
+<!-- Node Modal -->
+<div class="modal-overlay" id="nodeModal">
+  <div class="modal">
+    <h3 id="nodeModalTitle">Add Node</h3>
+    <label>System / Actor Name</label>
+    <input type="text" id="nodeNameInput" placeholder="e.g. Shopify, Customer Checkout, Klaviyo"/>
+    <label>Type</label>
+    <select id="nodeTypeInput">
+      <option value="entry">Entry Point</option>
+      <option value="storage">Storage</option>
+      <option value="processor">Processor</option>
+      <option value="thirdparty">Third Party / Vendor</option>
+      <option value="deletion">Deletion</option>
+    </select>
+    <label>Description (optional)</label>
+    <textarea id="nodeDescInput" placeholder="e.g. Collects name, email, phone at checkout"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNodeModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmNode()">Add Node</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edge Modal -->
+<div class="modal-overlay" id="edgeModal">
+  <div class="modal">
+    <h3>Label This Connection</h3>
+    <label>Data Being Transferred</label>
+    <input type="text" id="edgeLabelInput" placeholder="e.g. Name, email, order details"/>
+    <label>DPDP Note (optional)</label>
+    <input type="text" id="edgeNoteInput" placeholder="e.g. Requires consent (S.6), DPA needed"/>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEdgeModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmEdge()">Add Arrow</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>DPDP Data Flow Diagram Builder — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+
+<script>
+const TYPE_COLORS={
+  entry:{fill:'#dbeafe',stroke:'#2563eb',text:'#1e3a8a'},
+  storage:{fill:'#ede9fe',stroke:'#7c3aed',text:'#4c1d95'},
+  processor:{fill:'#ccfbf1',stroke:'#0f766e',text:'#064e3b'},
+  thirdparty:{fill:'#fef3c7',stroke:'#b45309',text:'#78350f'},
+  deletion:{fill:'#fee2e2',stroke:'#dc2626',text:'#7f1d1d'},
+};
+let nodes=[],edges=[],nodeId=1,edgeId=1;
+let connectMode=false,connectFrom=null;
+let dragNode=null,dragOff={x:0,y:0};
+let pendingNodeType=null,pendingEdge=null;
+let editingNode=null,editingEdge=null;
+
+const svg=document.getElementById('canvas');
+const nodesLayer=document.getElementById('nodesLayer');
+const edgesLayer=document.getElementById('edgesLayer');
+
+function startAddNode(type){
+  pendingNodeType=type;
+  document.getElementById('nodeTypeInput').value=type;
+  document.getElementById('nodeNameInput').value='';
+  document.getElementById('nodeDescInput').value='';
+  document.getElementById('nodeModalTitle').textContent='Add Node';
+  document.getElementById('nodeModal').classList.add('open');
+  document.getElementById('nodeNameInput').focus();
+}
+function closeNodeModal(){document.getElementById('nodeModal').classList.remove('open');pendingNodeType=null;editingNode=null;}
+function confirmNode(){
+  const name=document.getElementById('nodeNameInput').value.trim();
+  if(!name)return;
+  const type=document.getElementById('nodeTypeInput').value;
+  const desc=document.getElementById('nodeDescInput').value.trim();
+  if(editingNode){
+    editingNode.name=name;editingNode.type=type;editingNode.desc=desc;
+    renderAll();closeNodeModal();return;
+  }
+  const svgRect=svg.getBoundingClientRect();
+  const x=100+Math.random()*(svgRect.width-300);
+  const y=80+Math.random()*(svgRect.height-200);
+  nodes.push({id:nodeId++,name,type,desc,x,y,w:160,h:60});
+  renderAll();closeNodeModal();
+}
+
+function closeEdgeModal(){document.getElementById('edgeModal').classList.remove('open');pendingEdge=null;editingEdge=null;connectFrom=null;}
+function confirmEdge(){
+  const label=document.getElementById('edgeLabelInput').value.trim();
+  const note=document.getElementById('edgeNoteInput').value.trim();
+  if(editingEdge){editingEdge.label=label;editingEdge.note=note;renderAll();closeEdgeModal();return;}
+  if(!pendingEdge)return;
+  edges.push({id:edgeId++,...pendingEdge,label,note});
+  renderAll();closeEdgeModal();
+}
+
+function toggleConnect(){
+  connectMode=!connectMode;
+  connectFrom=null;
+  const btn=document.getElementById('connectBtn');
+  btn.textContent=connectMode?'✕ Cancel Arrow':'→ Draw Arrow';
+  btn.style.background=connectMode?'#fee2e2':'';
+  btn.style.color=connectMode?'#dc2626':'';
+  svg.style.cursor=connectMode?'crosshair':'default';
+}
+
+function renderAll(){
+  nodesLayer.innerHTML='';edgesLayer.innerHTML='';
+  edges.forEach(renderEdge);
+  nodes.forEach(renderNode);
+}
+
+function renderNode(node){
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','node-group');
+  g.setAttribute('data-id',node.id);
+  const c=TYPE_COLORS[node.type]||TYPE_COLORS.storage;
+  const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rect.setAttribute('class','node-rect');
+  rect.setAttribute('x',node.x);rect.setAttribute('y',node.y);
+  rect.setAttribute('width',node.w);rect.setAttribute('height',node.h);
+  rect.setAttribute('fill',c.fill);rect.setAttribute('stroke',c.stroke);
+  rect.setAttribute('rx',8);rect.setAttribute('ry',8);
+  rect.setAttribute('stroke-width',2.5);
+  rect.setAttribute('filter','drop-shadow(0 2px 6px rgba(0,0,0,0.1))');
+  g.appendChild(rect);
+  const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('class','node-text');
+  txt.setAttribute('x',node.x+node.w/2);
+  txt.setAttribute('y',node.desc?node.y+node.h/2-8:node.y+node.h/2);
+  txt.setAttribute('fill',c.text);txt.setAttribute('dominant-baseline','middle');txt.setAttribute('text-anchor','middle');
+  txt.setAttribute('font-size','12');txt.setAttribute('font-weight','700');txt.setAttribute('font-family','Segoe UI,system-ui,sans-serif');
+  txt.textContent=node.name.length>20?node.name.substring(0,18)+'…':node.name;
+  g.appendChild(txt);
+  if(node.desc){
+    const stxt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    stxt.setAttribute('x',node.x+node.w/2);stxt.setAttribute('y',node.y+node.h/2+10);
+    stxt.setAttribute('fill',c.text);stxt.setAttribute('opacity','0.7');
+    stxt.setAttribute('dominant-baseline','middle');stxt.setAttribute('text-anchor','middle');
+    stxt.setAttribute('font-size','9');stxt.setAttribute('font-family','Segoe UI,system-ui,sans-serif');
+    const shortDesc=node.desc.length>28?node.desc.substring(0,26)+'…':node.desc;
+    stxt.textContent=shortDesc;
+    g.appendChild(stxt);
+  }
+  // Type badge
+  const badge=document.createElementNS('http://www.w3.org/2000/svg','text');
+  badge.setAttribute('x',node.x+6);badge.setAttribute('y',node.y+11);
+  badge.setAttribute('fill',c.stroke);badge.setAttribute('font-size','8');badge.setAttribute('font-weight','700');
+  badge.setAttribute('font-family','Segoe UI,system-ui,sans-serif');badge.setAttribute('opacity','0.8');
+  badge.textContent=node.type.toUpperCase();
+  g.appendChild(badge);
+
+  // Events
+  g.addEventListener('mousedown',e=>{
+    if(connectMode){
+      if(!connectFrom){connectFrom=node.id;g.style.outline='2px solid orange';}
+      else if(connectFrom!==node.id){
+        pendingEdge={from:connectFrom,to:node.id};
+        document.getElementById('edgeLabelInput').value='';
+        document.getElementById('edgeNoteInput').value='';
+        document.getElementById('edgeModal').classList.add('open');
+        document.getElementById('edgeLabelInput').focus();
+        connectFrom=null;
+      }
+      e.stopPropagation();return;
+    }
+    dragNode=node;
+    const svgRect=svg.getBoundingClientRect();
+    dragOff.x=e.clientX-svgRect.left-node.x;
+    dragOff.y=e.clientY-svgRect.top-node.y;
+    e.stopPropagation();
+  });
+  g.addEventListener('dblclick',e=>{
+    editingNode=node;
+    document.getElementById('nodeNameInput').value=node.name;
+    document.getElementById('nodeTypeInput').value=node.type;
+    document.getElementById('nodeDescInput').value=node.desc||'';
+    document.getElementById('nodeModalTitle').textContent='Edit Node';
+    document.getElementById('nodeModal').classList.add('open');
+    e.stopPropagation();
+  });
+  g.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+    if(confirm(`Delete node "${node.name}"? Its connections will also be removed.`)){
+      nodes=nodes.filter(n=>n.id!==node.id);
+      edges=edges.filter(e=>e.from!==node.id&&e.to!==node.id);
+      renderAll();
+    }
+  });
+  nodesLayer.appendChild(g);
+}
+
+function renderEdge(edge){
+  const from=nodes.find(n=>n.id===edge.from);
+  const to=nodes.find(n=>n.id===edge.to);
+  if(!from||!to)return;
+  const x1=from.x+from.w/2,y1=from.y+from.h/2;
+  const x2=to.x+to.w/2,y2=to.y+to.h/2;
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.style.cursor='pointer';
+  const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('class','edge-line');
+  line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+  line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+  line.setAttribute('stroke','#9ca3af');line.setAttribute('marker-end','url(#arrowhead)');
+  g.appendChild(line);
+  if(edge.label){
+    const labelText=edge.label+(edge.note?'\n'+edge.note:'');
+    const lines=edge.label.split(' ').reduce((acc,word)=>{
+      const last=acc[acc.length-1];
+      if(last&&(last+' '+word).length<=22)acc[acc.length-1]=last+' '+word;
+      else acc.push(word);
+      return acc;
+    },['']);
+    const bgRect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bgRect.setAttribute('x',mx-55);bgRect.setAttribute('y',my-10*(lines.length));
+    bgRect.setAttribute('width',110);bgRect.setAttribute('height',18*lines.length+4);
+    bgRect.setAttribute('fill','white');bgRect.setAttribute('opacity','0.92');
+    bgRect.setAttribute('rx',3);bgRect.setAttribute('ry',3);
+    g.appendChild(bgRect);
+    lines.forEach((line2,i)=>{
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('class','edge-label');
+      t.setAttribute('x',mx);t.setAttribute('y',my-10*(lines.length-1)+18*i);
+      t.setAttribute('fill','#374151');t.setAttribute('font-size','9.5');
+      t.setAttribute('dominant-baseline','middle');t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-family','Segoe UI,system-ui,sans-serif');
+      t.textContent=line2;
+      g.appendChild(t);
+    });
+    if(edge.note){
+      const nt=document.createElementNS('http://www.w3.org/2000/svg','text');
+      nt.setAttribute('x',mx);nt.setAttribute('y',my+10*(lines.length));
+      nt.setAttribute('fill','#7c3aed');nt.setAttribute('font-size','8.5');
+      nt.setAttribute('dominant-baseline','middle');nt.setAttribute('text-anchor','middle');
+      nt.setAttribute('font-family','Segoe UI,system-ui,sans-serif');nt.setAttribute('font-style','italic');
+      nt.textContent=edge.note.length>30?edge.note.substring(0,28)+'…':edge.note;
+      g.appendChild(nt);
+    }
+  }
+  g.addEventListener('dblclick',()=>{
+    editingEdge=edge;
+    document.getElementById('edgeLabelInput').value=edge.label||'';
+    document.getElementById('edgeNoteInput').value=edge.note||'';
+    document.getElementById('edgeModal').classList.add('open');
+  });
+  g.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+    if(confirm('Delete this connection?')){edges=edges.filter(ed=>ed.id!==edge.id);renderAll();}
+  });
+  edgesLayer.appendChild(g);
+}
+
+svg.addEventListener('mousemove',e=>{
+  if(!dragNode)return;
+  const r=svg.getBoundingClientRect();
+  dragNode.x=e.clientX-r.left-dragOff.x;
+  dragNode.y=e.clientY-r.top-dragOff.y;
+  renderAll();
+});
+svg.addEventListener('mouseup',()=>{dragNode=null;});
+svg.addEventListener('mouseleave',()=>{dragNode=null;});
+
+function clearCanvas(){if(confirm('Clear the entire diagram?')){nodes=[];edges=[];nodeId=1;edgeId=1;renderAll();}}
+
+function loadExample(){
+  nodes=[];edges=[];nodeId=1;edgeId=1;
+  const ex=[
+    {name:'Customer Checkout',type:'entry',desc:'Name, email, phone, address',x:80,y:180,w:170,h:65},
+    {name:'Shopify',type:'storage',desc:'Order + customer data',x:320,y:100,w:150,h:65},
+    {name:'Internal DB',type:'storage',desc:'User accounts, usage logs',x:320,y:240,w:150,h:65},
+    {name:'Klaviyo',type:'thirdparty',desc:'Marketing emails',x:560,y:80,w:140,h:65},
+    {name:'Razorpay',type:'thirdparty',desc:'Payment processing',x:560,y:180,w:140,h:65},
+    {name:'Shiprocket',type:'thirdparty',desc:'Delivery fulfilment',x:560,y:280,w:140,h:65},
+    {name:'Account Deletion',type:'deletion',desc:'User-initiated or schedule',x:780,y:240,w:150,h:65},
+  ];
+  ex.forEach(n=>{nodes.push({id:nodeId++,...n});});
+  const edgeData=[
+    {from:1,to:2,label:'Name, email, phone, address, order',note:'Consent required (S.6)'},
+    {from:1,to:3,label:'Email, phone, subscription',note:'Consent required (S.6)'},
+    {from:2,to:4,label:'Name, email, purchase history',note:'DPA needed — Klaviyo'},
+    {from:2,to:5,label:'Name, email, payment data',note:'DPA in place — Razorpay'},
+    {from:2,to:6,label:'Name, phone, delivery address',note:'DPA needed — Shiprocket'},
+    {from:3,to:7,label:'All user data',note:'Erasure right (S.12)'},
+  ];
+  edgeData.forEach(e=>{edges.push({id:edgeId++,...e});});
+  renderAll();
+}
+
+// Keyboard shortcut: Escape to cancel connect mode
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&connectMode)toggleConnect();});
+
+// Load example on start
+window.addEventListener('load',loadExample);
+</script>
+</body>
+</html>

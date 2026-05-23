@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DPDP Vendor Data Map | Specus Labs</title>
+  <style>
+    :root{--ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--accent:#7c3aed;--accent-light:#f5f3ff;--red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;--green:#16a34a;--green-light:#f0fdf4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+    header{background:var(--ink);color:white;padding:22px 32px;}
+    header h1{font-size:19px;font-weight:700;margin-bottom:3px;}
+    header p{font-size:12px;opacity:0.65;}
+    .meta{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:24px;flex-wrap:wrap;}
+    .mf{display:flex;flex-direction:column;gap:2px;}
+    .mf label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .mf input{border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;}
+    .disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:9px 32px;font-size:11px;color:var(--amber);}
+    .controls{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+    .btn{padding:7px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--accent);color:white;}
+    .btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+    .search-input{padding:7px 11px;border:1px solid var(--border);border-radius:5px;font-size:12px;width:220px;}
+    .legend{padding:10px 32px;display:flex;gap:16px;align-items:center;font-size:11px;color:var(--muted);flex-wrap:wrap;}
+    .legend-item{display:flex;align-items:center;gap:5px;}
+    .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+    .table-wrap{overflow-x:auto;padding:0 32px 32px;margin-top:16px;}
+    table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1200px;}
+    thead tr{background:var(--ink);color:white;}
+    thead th{padding:11px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;}
+    tbody tr{border-bottom:1px solid var(--border);}
+    tbody tr.priority{background:var(--red-light);}
+    tbody tr:hover{background:var(--accent-light);}
+    tbody td{padding:10px 12px;vertical-align:top;font-size:12px;}
+    .editable{outline:none;padding:3px 5px;border-radius:3px;display:block;min-width:80px;}
+    .editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+    .badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
+    .badge-y{background:var(--green-light);color:var(--green);}
+    .badge-n{background:var(--red-light);color:var(--red);}
+    .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:1px 5px;border-radius:3px;}
+    .del-btn:hover{color:var(--red);background:var(--red-light);}
+    .add-row-row td{padding:10px;text-align:center;}
+    .add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:7px 20px;cursor:pointer;font-size:12px;width:100%;}
+    .add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+    footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.6);padding:18px 32px;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+    footer a{color:rgba(255,255,255,.8);}
+    @media print{.controls,.del-btn,.add-row-row,.legend{display:none;}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>DPDP Vendor Data Map</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Section 2(j) — Data Processor obligations | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. Rows highlighted in red = DPA not yet in place. Prioritise these vendors. Consult a qualified legal professional.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search vendors, data types…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add Vendor</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+  <span style="margin-left:auto;font-size:10px;color:var(--muted)">Red rows = DPA needed urgently</span>
+</div>
+<div class="legend">
+  <span class="legend-item"><span class="dot" style="background:var(--red-light);border:1.5px solid var(--red)"></span>No DPA in place — action required</span>
+  <span class="legend-item"><span class="dot" style="background:var(--green-light);border:1.5px solid var(--green)"></span>DPA in place</span>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>Vendor Name</th><th>Vendor Type</th><th>Country</th>
+    <th>Data Shared</th><th>Purpose</th><th>Data Subjects</th>
+    <th>DPA in Place</th><th>DPA Review Date</th><th>Cross-Border</th>
+    <th>Notes / Action</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP Vendor Data Map — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const DPA_IDX=7;
+const defaults=[
+  ["Razorpay Financial Services","Payment gateway","India","Customer name, email, phone, tokenised card, UPI, transaction records","Payment processing","Customers","Y","[Date]","N","Regulated by RBI — confirm DPA is signed"],
+  ["Shiprocket","Logistics platform","India","Customer name, phone, delivery address, order ID","Delivery fulfilment","Customers","N","[Action needed]","N","No DPA confirmed. Issue DPA using DPDP Vendor Compliance Kit."],
+  ["Klaviyo Inc.","Email marketing SaaS","USA","Customer name, email, purchase history, engagement data","Marketing campaigns","Customers","N","[Action needed]","Y","Transfers data to USA. Request DPA from Klaviyo."],
+  ["Google LLC","Analytics platform","USA","Anonymised IP, device type, session data","Website analytics","Website visitors","N","[Action needed]","Y","Requires DPA and privacy policy disclosure."],
+  ["Meta Platforms Inc.","Advertising platform","USA","Hashed email and phone, ad engagement data","Paid advertising","Customers","N","[Action needed]","Y","Data transferred to USA. Requires DPA and consent for custom audience."],
+  ["Intercom R&D","Customer support SaaS","Ireland (EU)","Customer name, email, support conversation history","Customer support","Customers","N","[Action needed]","Y","GDPR-compliant processor. Request standard DPA from Intercom."],
+  ["AWS","Cloud infrastructure","USA/India","All hosted data (indirect)","Cloud hosting and storage","All","Y","[Date]","N","Use Mumbai region (ap-south-1) to avoid cross-border transfer."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));
+let nid=rows.length+1;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const noDPA=row.cells[DPA_IDX].trim().toUpperCase()==='N';
+    const tr=document.createElement('tr');
+    if(noDPA)tr.className='priority';
+    tr.dataset.id=row.id;
+    const tn=document.createElement('td');tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:11px;';tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      if(ci===DPA_IDX){
+        const sel=document.createElement('select');
+        sel.style.cssText='border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-weight:700;';
+        ['Y','N','Pending'].forEach(opt=>{
+          const o=document.createElement('option');o.value=opt;o.textContent=opt;
+          if(cell.trim().toUpperCase()===opt)o.selected=true;
+          sel.appendChild(o);
+        });
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;render();};
+        td.appendChild(sel);
+      } else {
+        const div=document.createElement('div');div.className='editable';div.contentEditable=true;div.textContent=cell;
+        div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};td.appendChild(div);
+      }
+      tr.appendChild(td);
+    });
+    const td=document.createElement('td');
+    const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove vendor?')){rows.splice(idx,1);render();}};
+    td.appendChild(btn);tr.appendChild(td);tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';
+  const at=document.createElement('td');at.colSpan=13;
+  const ab=document.createElement('button');ab.className='add-row-btn';ab.textContent='+ Add vendor';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(11).fill('')});render();}
+function exportCSV(){
+  const h=["Vendor Name","Vendor Type","Country","Data Shared","Purpose","Data Subjects","DPA in Place","DPA Review Date","Cross-Border Transfer","Notes / Action"];
+  let csv='DPDP Vendor Data Map\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='dpdp-vendor-data-map.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>

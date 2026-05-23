@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPDP Data Inventory — D2C E-Commerce | Specus Labs</title>
+<style>
+:root{--ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--accent:#2563eb;--accent-light:#eff6ff;--red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;--green:#16a34a;--green-light:#f0fdf4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+header{background:var(--ink);color:white;padding:20px 28px;}
+header h1{font-size:18px;font-weight:700;margin-bottom:3px;}
+header p{font-size:11px;opacity:0.6;}
+.sector-tag{display:inline-block;background:#dbeafe;color:#1e3a8a;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:6px;}
+.meta{background:var(--white);border-bottom:1px solid var(--border);padding:11px 28px;display:flex;gap:20px;flex-wrap:wrap;}
+.mf{display:flex;flex-direction:column;gap:2px;}
+.mf label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.mf input{border:1px solid var(--border);border-radius:4px;padding:3px 7px;font-size:12px;}
+.disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:8px 28px;font-size:11px;color:var(--amber);}
+.controls{padding:11px 28px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+.btn{padding:6px 13px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+.search-input{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:11px;width:200px;}
+.table-wrap{overflow-x:auto;padding:0 28px 28px;margin-top:18px;}
+table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1500px;}
+thead tr{background:var(--ink);color:white;}
+thead th{padding:10px 11px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:hover{background:var(--accent-light);}
+tbody td{padding:9px 11px;vertical-align:top;font-size:11px;}
+.editable{outline:none;padding:2px 4px;border-radius:3px;display:block;min-width:90px;}
+.editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+.risk-h{color:var(--red);font-weight:700;}
+.risk-m{color:var(--amber);font-weight:700;}
+.risk-l{color:var(--green);font-weight:700;}
+select.risk-sel{border:1px solid var(--border);border-radius:4px;padding:2px 5px;font-size:10px;font-weight:700;}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:1px 4px;border-radius:3px;}
+.del-btn:hover{color:var(--red);background:var(--red-light);}
+.add-row-row td{padding:8px;text-align:center;}
+.add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:6px 18px;cursor:pointer;font-size:11px;width:100%;}
+.add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+.priority-box{margin:16px 28px;background:var(--red-light);border:1px solid #fca5a5;border-radius:8px;padding:14px 18px;}
+.priority-box h3{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.priority-box li{font-size:11px;margin-left:16px;margin-bottom:4px;color:var(--ink);}
+footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.55);padding:16px 28px;font-size:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+footer a{color:rgba(255,255,255,.75);}
+@media print{.controls,.del-btn,.add-row-row,.priority-box{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="sector-tag">D2C E-COMMERCE</div>
+  <h1>DPDP Data Inventory — D2C E-Commerce</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. Pre-filled rows reflect typical D2C systems. Edit to match your actual setup. Consult a qualified legal professional.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search systems or data types…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add System</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+  <span style="margin-left:auto;font-size:10px;color:var(--muted)">Click any cell to edit</span>
+</div>
+<div class="priority-box">
+  <h3>⚡ Priority Actions for D2C Businesses</h3>
+  <ul>
+    <li>Add consent checkbox at Shopify checkout — most D2C stores are missing this (DPDP Act Section 6)</li>
+    <li>Issue DPAs with Shiprocket and Klaviyo — two most commonly unaddressed processors</li>
+    <li>Move HR/payroll data out of unencrypted spreadsheets</li>
+    <li>Implement cookie consent banner for GA4 and Meta Pixel</li>
+    <li>Document and test your customer erasure request process (Section 12)</li>
+  </ul>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>System</th><th>Type</th><th>Data Categories</th><th>Data Subjects</th>
+    <th>Purpose</th><th>Legal Basis</th><th>Internal Access</th><th>Vendor / Processor</th>
+    <th>Vendor Country</th><th>Cross-Border</th><th>Security</th><th>Retention</th>
+    <th>Deletion</th><th>Risk</th><th>Children's</th><th>Notes</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP Data Inventory — D2C E-Commerce — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const RISK_IDX=14,CHILD_IDX=15;
+const defaults=[
+  ["Shopify","E-commerce platform","Customer name, email, phone, address, order history, payment status","Customers","Order processing, account management","Consent (S.6)","Founder, Operations","Shopify Inc.","USA","Y","PCI DSS, TLS, 2FA","3 years from last order","Shopify admin or API deletion","Medium","N","Confirm DPA. Restrict admin access."],
+  ["Razorpay","Payment gateway","Name, email, phone, tokenised card, UPI, transaction records","Customers","Payment processing, refunds","Consent (S.6)","Founder, Finance","Razorpay Financial Services","India","N","PCI DSS L1, RBI regulated, TLS","5 years (regulatory)","Regulatory hold — cannot delete","Low","N","Erasure requests cannot be fulfilled for payment records. Document exception."],
+  ["Shiprocket","Logistics platform","Name, phone, address, order ID, tracking","Customers","Order fulfilment, tracking","Consent (S.6)","Operations","Shiprocket; Delhivery, Ekart (sub-processors)","India","N","Platform TLS","1 year from delivery","Shiprocket admin + sub-processor request","Low","N","DPA NOT confirmed — action required."],
+  ["Klaviyo","Email marketing","Name, email, purchase history, email engagement","Customers","Marketing campaigns, cart recovery","Consent (S.6)","Marketing, Founder","Klaviyo Inc.","USA","Y","SOC 2 Type II, TLS","2 years or until unsubscribe","Delete via Klaviyo dashboard or API","Medium","N","Cross-border. Issue DPA. Disclose in privacy policy."],
+  ["Google Analytics 4","Web analytics","Anonymised IP, device, session data, pages visited","Website visitors","Traffic analysis, conversion tracking","Legitimate use / Cookie consent","Marketing, Founder","Google LLC","USA","Y","IP anonymisation (verify), Google TLS","26 months","GA4 data deletion request","Low","Possible","Implement cookie consent banner. Verify IP anonymisation."],
+  ["Meta Ads Manager","Ad platform","Hashed email/phone (custom audience), pixel behavioural data","Customers, website visitors","Paid advertising, retargeting","Consent (S.6)","Marketing","Meta Platforms Inc.","USA","Y","Hashing before upload","Until audience deleted","Delete custom audience in Ads Manager","Medium","N","Consent required before uploading custom audiences."],
+  ["Customer Support Tool","Support platform","Name, email, order details, conversation history","Customers","Support, issue resolution","Consent (S.6)","Support, Founder","Intercom / Freshworks / Zendesk","Ireland/India/USA","Y","SOC 2, TLS","2 years from resolution","Delete contact via platform admin","Low","N","Confirm which tool. Update row. Get DPA."],
+  ["Internal Database","Product DB","User ID, name, email, phone, subscription, usage logs","Registered customers","Product functionality, debugging","Consent (S.6)","Engineering","AWS / GCP (infrastructure)","India/USA","Check region","AES-256, TLS, RBAC","Account + 1 year post-deletion","Automated account deletion API","High","N","Confirm database region. Restrict access to engineering lead only."],
+  ["HR Spreadsheet","Spreadsheet","Name, phone, PAN, Aadhaar, bank account, salary","Employees","Payroll, HR, statutory compliance","Contractual necessity","Founder, HR","External accountant (email)","India","N","Google Workspace 2FA — restrict sharing","Employment + 5 years post-exit","Manual deletion from all copies","High","N","HIGH RISK. Move to dedicated HR tool. Stop sharing via email."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));let nid=rows.length+1;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const tr=document.createElement('tr');
+    const tn=document.createElement('td');tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:10px;';tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      if(ci===RISK_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['Low','Medium','High'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else if(ci===CHILD_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['N','Y','Possible'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else {
+        const div=document.createElement('div');div.className='editable';div.contentEditable=true;div.textContent=cell;div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};td.appendChild(div);
+      }
+      tr.appendChild(td);
+    });
+    const td=document.createElement('td');const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove row?')){rows.splice(idx,1);render();}};td.appendChild(btn);tr.appendChild(td);tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';const at=document.createElement('td');at.colSpan=19;
+  const ab=document.createElement('button');ab.className='add-row-btn';ab.textContent='+ Add system';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(17).fill('')});render();}
+function exportCSV(){
+  const h=["System","Type","Data Categories","Data Subjects","Purpose","Legal Basis","Internal Access","Vendor","Vendor Country","Cross-Border","Security","Retention","Deletion","Risk","Children's","Notes"];
+  let csv='DPDP Data Inventory — D2C E-Commerce\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='dpdp-d2c-data-inventory.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>

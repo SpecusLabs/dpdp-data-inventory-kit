@@ -1,0 +1,24 @@
+DPDP Data Inventory — Lite Version,,,,,
+By Specus Labs | CC BY 4.0 | This is not legal advice.,,,,,
+Last Updated,,[DATE],,Reviewed By,[NAME]
+,,,,,
+System Name,Data Categories Held,Purpose of Processing,Who Has Access (Internal Roles),Shared With (Vendors / Third Parties),Retention Period
+,,,,,
+[Example: Shopify],"Customer name, email, phone, delivery address, order history, payment status","Order processing, delivery fulfilment, customer account management","Founder, Operations team","Shiprocket (logistics), Razorpay (payments)",3 years from last order
+[Example: Razorpay],"Customer name, email, phone, payment card details (tokenised), UPI ID, transaction history","Payment processing, refund management","Founder, Finance team",Razorpay internal processors only,5 years (regulatory requirement)
+[Example: Klaviyo],"Customer name, email, purchase history, email engagement data (opens, clicks)","Marketing email campaigns, abandoned cart recovery","Marketing team, Founder","None — Klaviyo is the processor",2 years or until unsubscribe
+[Example: Shiprocket],"Customer name, phone, delivery address, order details","Logistics and delivery management","Operations team","Last-mile courier partners (Delhivery, Ekart, etc.)",1 year from delivery date
+[Example: Google Analytics 4],"IP address (anonymised), device type, session data, pages visited, city-level location","Website analytics and traffic analysis","Marketing team, Founder",Google,26 months (GA4 default)
+[Example: HR Spreadsheet (Google Sheets)],"Employee name, phone, email, address, PAN, bank account, salary, date of joining","Payroll processing, HR management","Founder, HR lead",Accountant (for payroll),Duration of employment + 5 years
+[Example: WhatsApp Business],"Customer name, phone number, chat transcripts","Customer support, order status updates","Support team","WhatsApp / Meta",1 year
+[Example: Intercom],"Customer name, email, support chat transcripts, issue history","Customer support and helpdesk","Support team, Founder",None — Intercom is the processor,2 years
+[Example: Meta Ads Manager],"Custom audience data uploaded (hashed email/phone), ad engagement data","Paid advertising and retargeting","Marketing team","Meta Platforms",Until campaign ends or audience deleted
+[Example: Internal MySQL Database],"User ID, name, email, phone, subscription status, usage logs","Product functionality, user account management","Engineering team",None,Duration of account + 1 year post deletion
+,,,,,
+Add more rows above this line,,,,,
+,,,,,
+NOTES,,,,,
+1. Lite version covers the six core fields. For a full inventory including legal basis and risk levels use data-inventory-master.csv,,,,,
+2. DPDP Act Section 8(7) requires data to be deleted when it is no longer needed for the stated purpose,,,,,
+3. Review this inventory at least once every 6 months or whenever you onboard a new system or vendor,,,,,
+4. This is not legal advice. Consult a qualified legal professional for advice specific to your organisation,,,,,

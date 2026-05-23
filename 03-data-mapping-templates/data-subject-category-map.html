@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DPDP Data Subject Category Map | Specus Labs</title>
+  <style>
+    :root{--ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--accent:#0369a1;--accent-light:#f0f9ff;--red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;--green:#16a34a;--green-light:#f0fdf4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+    header{background:var(--ink);color:white;padding:22px 32px;}
+    header h1{font-size:19px;font-weight:700;margin-bottom:3px;}
+    header p{font-size:12px;opacity:0.65;}
+    .meta{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:24px;flex-wrap:wrap;}
+    .mf{display:flex;flex-direction:column;gap:2px;}
+    .mf label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .mf input{border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;}
+    .disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:9px 32px;font-size:11px;color:var(--amber);}
+    .controls{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+    .btn{padding:7px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--accent);color:white;}
+    .btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+    .search-input{padding:7px 11px;border:1px solid var(--border);border-radius:5px;font-size:12px;width:220px;}
+    .table-wrap{overflow-x:auto;padding:0 32px 32px;margin-top:20px;}
+    table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1100px;}
+    thead tr{background:var(--ink);color:white;}
+    thead th{padding:11px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;}
+    tbody tr{border-bottom:1px solid var(--border);}
+    tbody tr:hover{background:var(--accent-light);}
+    tbody td{padding:10px 12px;vertical-align:top;font-size:12px;}
+    .editable{outline:none;padding:3px 5px;border-radius:3px;display:block;min-width:80px;}
+    .editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+    .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:1px 5px;border-radius:3px;}
+    .del-btn:hover{color:var(--red);background:var(--red-light);}
+    .add-row-row td{padding:10px;text-align:center;}
+    .add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:7px 20px;cursor:pointer;font-size:12px;width:100%;}
+    .add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+    footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.6);padding:18px 32px;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+    footer a{color:rgba(255,255,255,.8);}
+    @media print{.controls,.del-btn,.add-row-row{display:none;}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>DPDP Data Subject Category Map</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Section 11 &amp; 12 — Rights of Data Principals | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. Consult a qualified legal professional for advice specific to your organisation.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search data subject categories…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add Category</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>Data Subject Category</th><th>Description</th><th>Approx. Volume</th>
+    <th>Systems Where Data Held</th><th>Data Categories</th><th>Consent Obtained</th>
+    <th>Consent Mechanism</th><th>Rights Contact Method</th><th>Special Considerations</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP Data Subject Category Map — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const defaults=[
+  ["Registered Customers","Individuals with accounts who have purchased","","Shopify, Razorpay, Klaviyo, Internal DB","Name, email, phone, address, purchase history","Y","Checkout consent checkbox","support@[yourdomain].com","Standard rights apply. Document erasure process."],
+  ["Guest Customers","One-time purchasers without accounts","","Shopify, Razorpay, Shiprocket","Name, email, phone, delivery address, order details","Y (implied at checkout)","Privacy policy at checkout","support@[yourdomain].com","Payment records may have regulatory retention hold."],
+  ["Marketing Contacts","Email subscribers","","Klaviyo, email platform","Name, email, engagement data","Y","Email opt-in form","Unsubscribe link + support email","Must honour unsubscribe immediately."],
+  ["Website Visitors","Anonymous users tracked via analytics","","Google Analytics 4","Anonymised IP, session data","N","Cookie banner (if implemented)","N/A — anonymous","Verify IP anonymisation in GA4."],
+  ["Full-Time Employees","Current and former employees","","HR spreadsheet, payroll, email","Name, address, PAN, Aadhaar, bank, salary","Y","Employment contract + onboarding","HR lead or founder","HIGH SENSITIVITY — PAN and Aadhaar. Retain 5+ years post-exit."],
+  ["Contractors / Freelancers","Project-based engagements","","Contracts, email, invoices","Name, PAN, bank, service agreement","Y","Service agreement","Founder or operations","PAN required for TDS. Retain 7 years."],
+  ["Staffing Candidates","Job applicants not yet placed","","Email, HR spreadsheet","Name, phone, email, resume, work history","Y","Job application","HR lead","Delete within 1 year if not placed and no ongoing engagement."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));let nid=rows.length+1;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const tr=document.createElement('tr');
+    const tn=document.createElement('td');tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:11px;';tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      const div=document.createElement('div');div.className='editable';div.contentEditable=true;div.textContent=cell;
+      div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};td.appendChild(div);tr.appendChild(td);
+    });
+    const td=document.createElement('td');
+    const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove?')){rows.splice(idx,1);render();}};
+    td.appendChild(btn);tr.appendChild(td);tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';
+  const at=document.createElement('td');at.colSpan=12;
+  const ab=document.createElement('button');ab.className='add-row-btn';ab.textContent='+ Add data subject category';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(9).fill('')});render();}
+function exportCSV(){
+  const h=["Data Subject Category","Description","Approx. Volume","Systems","Data Categories","Consent Obtained","Consent Mechanism","Rights Contact","Special Considerations"];
+  let csv='DPDP Data Subject Category Map\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='dpdp-data-subject-category-map.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>

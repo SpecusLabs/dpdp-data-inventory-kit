@@ -1,0 +1,24 @@
+DPDP Vendor Data Map,,,,,,,,,,,
+By Specus Labs | CC BY 4.0 | This is not legal advice.,,,,,,,,,,,
+Organisation,,[ORG NAME],Last Updated,,[DATE],Reviewed By,,[NAME],,,
+,,,,,,,,,,,
+Vendor Name,Vendor Type,Country of Operation,Personal Data Shared With Vendor,Purpose of Sharing,Data Subjects Affected,DPA in Place (Y/N),DPA Expiry / Review Date,Cross-Border Transfer (Y/N),Sub-Processors Disclosed (Y/N),Right to Audit (Y/N),Notes / Action Required
+,,,,,,,,,,,
+Razorpay Financial Services,Payment gateway,India,"Customer name, email, phone, tokenised card data, UPI ID, transaction records","Payment processing, refund management",Customers,Y,[Date],N,Y,N,Regulated by RBI — standard DPA terms. Confirm DPA is signed and stored.
+Shiprocket,Logistics platform,India,"Customer name, phone, delivery address, order ID","Delivery fulfilment and logistics management",Customers,N,[Action needed],N,N,N,No DPA confirmed. Issue DPA using DPDP Vendor Compliance Kit. Carriers are sub-processors.
+Klaviyo Inc.,Email marketing SaaS,USA,"Customer name, email, purchase history, engagement data","Marketing campaigns, automated email flows",Customers,N,[Action needed],Y,Y,N,Transfers data to USA. Requires DPA. Review Klaviyo's standard DPA.
+Google LLC (Analytics),Analytics platform,USA,"Anonymised IP, device type, session data, page views",Website analytics and UX optimisation,Website visitors,N,[Action needed],Y,Y,N,Requires DPA and privacy policy disclosure. Verify IP anonymisation is enabled.
+Meta Platforms Inc.,Advertising platform,USA,"Hashed email and phone (custom audience), ad engagement data","Paid advertising, lookalike audience targeting",Customers (marketing),N,[Action needed],Y,Y,N,Data transferred to USA. Requires DPA and consent for custom audience upload.
+Intercom R&D,Customer support SaaS,Ireland (EU),Customer name + email + support conversation history,Customer support and helpdesk,Customers,N,[Action needed],Y,Y,N,GDPR-compliant processor. Request standard DPA from Intercom. Data stored in EU.
+AWS (Amazon Web Services),Cloud infrastructure,USA (India region available),"All data in hosted databases (indirect access)","Cloud hosting, database, and storage infrastructure","Customers, employees (all)",Y,[Date],N,Y,Y,Using Mumbai (ap-south-1) region — no cross-border transfer if configured correctly. Confirm region setting.
+Delhivery / Ekart / Xpressbees,Last-mile courier,India,"Customer name, phone, delivery address","Last-mile delivery execution",Customers,N,[Action needed],N,N,N,Sub-processors via Shiprocket. Shiprocket's DPA should cover these — confirm with Shiprocket.
+External Accountant (individual),Professional services,India,"Employee name, PAN, bank account, salary details","Payroll processing and tax filing",Employees,N,[Action needed],N,N,N,HIGH RISK — sensitive employee data shared informally. Issue a professional services data agreement immediately.
+WhatsApp / Meta Business,Messaging platform,USA,"Customer name, phone, chat transcripts","Customer support messaging",Customers,N,[Action needed],Y,Y,N,WhatsApp Business Terms of Service apply. Review if additional DPA required for your scale.
+,,,,,,,,,,,
+Add more rows above this line,,,,,,,,,,,
+,,,,,,,,,,,
+PRIORITY ACTIONS,,,,,,,,,,,,
+Any vendor with DPA in Place = N should be treated as a priority. Issue DPAs using the DPDP Vendor Compliance Kit.,,,,,,,,,,,
+Cross-border transfers (Y) require additional scrutiny under DPDP Rules 2025 — monitor for government guidance.,,,,,,,,,,,
+DPDP Act reference: Section 2(j) defines Data Processor. Section 8 requires Data Fiduciaries to ensure processors comply.,,,,,,,,,,,
+This is not legal advice. Consult a qualified legal professional for advice specific to your organisation.,,,,,,,,,,,

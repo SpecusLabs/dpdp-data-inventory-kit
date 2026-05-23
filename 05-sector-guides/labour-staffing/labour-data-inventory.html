@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPDP Data Inventory — Labour & Staffing | Specus Labs</title>
+<style>
+:root{--ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--accent:#0f766e;--accent-light:#f0fdfa;--red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;--green:#16a34a;--green-light:#f0fdf4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+header{background:var(--ink);color:white;padding:20px 28px;}
+header h1{font-size:18px;font-weight:700;margin-bottom:3px;}
+header p{font-size:11px;opacity:0.6;}
+.sector-tag{display:inline-block;background:#ccfbf1;color:#064e3b;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:6px;}
+.meta{background:var(--white);border-bottom:1px solid var(--border);padding:11px 28px;display:flex;gap:20px;flex-wrap:wrap;}
+.mf{display:flex;flex-direction:column;gap:2px;}
+.mf label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.mf input{border:1px solid var(--border);border-radius:4px;padding:3px 7px;font-size:12px;}
+.disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:8px 28px;font-size:11px;color:var(--amber);}
+.controls{padding:11px 28px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+.btn{padding:6px 13px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+.search-input{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:11px;width:200px;}
+.table-wrap{overflow-x:auto;padding:0 28px 28px;margin-top:14px;}
+table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1500px;}
+thead tr{background:var(--ink);color:white;}
+thead th{padding:10px 11px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:hover{background:var(--accent-light);}
+tbody td{padding:9px 11px;vertical-align:top;font-size:11px;}
+.editable{outline:none;padding:2px 4px;border-radius:3px;display:block;min-width:90px;}
+.editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+select.risk-sel{border:1px solid var(--border);border-radius:4px;padding:2px 5px;font-size:10px;font-weight:700;}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:1px 4px;border-radius:3px;}
+.del-btn:hover{color:var(--red);background:var(--red-light);}
+.add-row-row td{padding:8px;text-align:center;}
+.add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:6px 18px;cursor:pointer;font-size:11px;width:100%;}
+.add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+.priority-box{margin:16px 28px;background:var(--red-light);border:1px solid #fca5a5;border-radius:8px;padding:14px 18px;}
+.priority-box h3{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.priority-box li{font-size:11px;margin-left:16px;margin-bottom:4px;color:var(--ink);}
+footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.55);padding:16px 28px;font-size:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+footer a{color:rgba(255,255,255,.75);}
+@media print{.controls,.del-btn,.add-row-row,.priority-box{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="sector-tag">LABOUR SUPPLY &amp; STAFFING</div>
+  <h1>DPDP Data Inventory — Labour Supply &amp; Staffing</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. Staffing businesses handle some of the most sensitive data under DPDP. Edit rows to match your actual setup. Consult a qualified legal professional.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search systems or data types…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add System</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+</div>
+<div class="priority-box">
+  <h3>⚡ Priority Actions for Staffing Businesses</h3>
+  <ul>
+    <li>Replace WhatsApp document collection with a digital intake form (consent required — Section 6)</li>
+    <li>Audit Google Drive and Google Sheet sharing settings — remove unnecessary access today</li>
+    <li>Stop using personal recruiter email for candidate data — move to company email</li>
+    <li>Issue DPA with background verification agency before next BGV run</li>
+    <li>Delete Aadhaar and PAN scans after statutory registration is complete</li>
+    <li>Set 12-month deletion trigger for non-placed candidates</li>
+  </ul>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>System</th><th>Type</th><th>Data Categories</th><th>Data Subjects</th>
+    <th>Purpose</th><th>Legal Basis</th><th>Internal Access</th><th>Vendor / Processor</th>
+    <th>Vendor Country</th><th>Cross-Border</th><th>Security</th><th>Retention</th>
+    <th>Deletion</th><th>Risk</th><th>Children's</th><th>Notes</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP Data Inventory — Labour &amp; Staffing — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const defaults=[
+  ["Candidate Intake Form","Digital form","Name, phone, email, city, role, experience, consent timestamp","Candidates","Intake, screening, consent capture","Consent (S.6)","Recruitment team","Google LLC / Typeform","USA","Y","Google 2FA, form access restricted","12 months (not placed) / 3 years (placed)","Delete from Google Forms + tracker","Medium","N","Must include consent checkbox. Replaces WhatsApp intake. IMPLEMENT NOW."],
+  ["Candidate Tracker (Google Sheet)","Spreadsheet","Name, phone, email, skills, placement status, client assigned, salary","Candidates","Pipeline management, placement tracking","Consent (S.6)","Recruitment team, Founder only","Google LLC","USA","Y","Google Workspace 2FA, sharing restricted","12 months (not placed) / 3 years (placed)","Delete rows manually. Audit access quarterly.","High","N","HIGH RISK. Audit sharing settings today. Remove access for ex-staff."],
+  ["Google Drive — Candidate Docs","Cloud storage","Aadhaar, PAN, bank details, photos, certificates","Candidates","Statutory compliance, BGV, KYC","Consent (S.6)","Recruitment lead, Founder only","Google LLC","USA","Y","Folder access restricted, link sharing DISABLED","Delete IDs within 60 days of statutory use","Manual deletion. Audit quarterly.","High","N","HIGHEST RISK. Disable link sharing. Delete IDs promptly after use."],
+  ["WhatsApp Business","Messaging","Name, phone, job messages — NO documents","Candidates, clients","Communication only","Consent implied","Recruitment team","Meta Platforms Inc.","USA","Y","E2E encryption in transit","1 year from last message","Manual deletion of chats","High","N","Do NOT accept documents via WhatsApp. Communication only."],
+  ["Recruiter Personal Email","Personal email","Resumes, documents — MUST STOP","Candidates","Informal — should not be used","N/A","Individual recruiter","Personal provider","USA","Y","No org control","Unknown — no policy possible","Cannot control or audit","High","N","CRITICAL: Stop immediately. Forward to company email and delete from personal."],
+  ["BGV Agency Portal","Third-party BGV","Aadhaar, PAN, employment history, address for verification","Candidates","Pre-employment background verification","Consent (S.6) — BGV-specific","Recruitment team, Founder","AuthBridge / IDfy / equivalent","India","N","BGV agency platform security","End of engagement — request deletion","Request deletion in writing from BGV agency","High","N","DPA REQUIRED. Candidate must consent specifically to BGV."],
+  ["Client Candidate Submission","Email / client portal","Candidate name, resume, contact, notes","Candidates","Client approval for placement","Consent (S.6)","Recruitment team","Client company (external)","India","N","Email TLS","Delete after placement confirmation","Delete from sent folder","Medium","N","Inform candidate their data will be shared with client — include in consent notice."],
+  ["Payroll Software / Sheet","Payroll / spreadsheet","Bank account, IFSC, UAN, ESI, salary, TDS","Placed workers","Salary disbursement, statutory compliance","Legal obligation / Contract","Founder, Finance, Accountant","Payroll vendor / accountant","India","N","Software encryption or password-protected file","8 years (statutory)","Cannot delete within statutory period","High","N","Consider dedicated payroll software. Restrict bank details access strictly."],
+  ["Government Portals (EPFO/ESIC)","Government portal","Name, Aadhaar-linked, PAN, UAN, contribution records","Placed workers","PF/ESI statutory registration","Legal obligation","Compliance team, Accountant","Government of India","India","N","Government portal security","Statutory — do not delete","Cannot delete — statutory records","Low","N","Use unique, strong passwords. Do not share login credentials verbally."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));let nid=rows.length+1;
+const RISK_IDX=14,CHILD_IDX=15;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const tr=document.createElement('tr');
+    const tn=document.createElement('td');tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:10px;';tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      if(ci===RISK_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['Low','Medium','High'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else if(ci===CHILD_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['N','Y','Possible'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else {
+        const div=document.createElement('div');div.className='editable';div.contentEditable=true;div.textContent=cell;div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};td.appendChild(div);
+      }
+      tr.appendChild(td);
+    });
+    const td=document.createElement('td');const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove row?')){rows.splice(idx,1);render();}};td.appendChild(btn);tr.appendChild(td);tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';const at=document.createElement('td');at.colSpan=19;
+  const ab=document.createElement('button');ab.className='add-row-btn';ab.textContent='+ Add system';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(17).fill('')});render();}
+function exportCSV(){
+  const h=["System","Type","Data Categories","Data Subjects","Purpose","Legal Basis","Internal Access","Vendor","Vendor Country","Cross-Border","Security","Retention","Deletion","Risk","Children's","Notes"];
+  let csv='DPDP Data Inventory — Labour & Staffing\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='dpdp-labour-staffing-data-inventory.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>

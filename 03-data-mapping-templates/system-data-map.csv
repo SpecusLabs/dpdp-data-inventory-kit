@@ -1,0 +1,21 @@
+DPDP System Data Map,,,,,,,,,,
+By Specus Labs | CC BY 4.0 | This is not legal advice.,,,,,,,,,,
+Organisation,,[ORG NAME],Last Updated,,[DATE],Reviewed By,,[NAME],,
+,,,,,,,,,,
+System Name,System Owner / Admin,System Type,Personal Data Categories Held,Data Enters This System From,Data Exits This System To,Who Has Internal Access (Roles),Authentication / Access Control,Encryption (Y/N),Backup Location,Notes / Risk Flags
+,,,,,,,,,,
+Shopify,Operations Lead,E-commerce platform,"Customer name, email, phone, address, order history, payment status","Customer checkout (direct), Meta Ads (attribution)","Razorpay (payment), Shiprocket (fulfilment), Klaviyo (marketing)","Founder, Operations",Shopify login + 2FA,Y,Shopify cloud (US),PCI DSS compliant
+Razorpay,Finance Lead,Payment gateway,"Customer name, email, phone, tokenised card data, UPI ID, transaction records","Shopify checkout integration","Razorpay internal only (regulatory)","Founder, Finance",Razorpay login + 2FA,Y,Razorpay servers (India),RBI regulated — cannot delete due to regulatory hold
+Klaviyo,Marketing Lead,Email marketing platform,"Customer name, email, purchase history, email engagement (opens, clicks)","Shopify integration (automated sync)","None — Klaviyo is endpoint","Marketing team, Founder",Klaviyo login + 2FA,Y,Klaviyo cloud (US),Review unsubscribe handling and suppression lists
+Shiprocket,Operations Lead,Logistics and shipping platform,"Customer name, phone, delivery address, order ID, shipment tracking","Shopify integration (automated sync)","Last-mile carriers (Delhivery, Ekart, etc.)","Operations team",Shiprocket login,Y,Shiprocket cloud (India),Carriers are sub-processors — confirm their data handling
+Google Analytics 4,Marketing Lead,Web analytics,"Anonymised IP, device ID, session data, page views, conversion events","GA4 tracking code on website","Google (data processor), internal reports","Marketing team, Founder",Google Workspace account,Y (IP anonymised),Google cloud (US),Enable IP anonymisation — verify if done
+Internal MySQL Database,Engineering Lead,Product database,"User ID, name, email, phone, subscription plan, feature usage logs, session tokens","User registration and in-app actions","AWS RDS backups only","Engineering team",SSH key + IAM role-based access,Y (AES-256),AWS S3 (India),Highest risk system — review access controls quarterly
+HR Google Sheet,Founder / HR,Spreadsheet,"Employee name, phone, email, address, PAN, Aadhaar, bank account, salary, leave records","Collected directly from employees during onboarding","External accountant (via email attachment)","Founder, HR lead",Google Workspace account + sharing restricted,N (spreadsheet),Google Drive,HIGH RISK — contains Aadhaar and PAN. Move to dedicated HR system. Restrict sharing immediately.
+WhatsApp Business,Support Lead,Messaging platform,"Customer name, phone, chat transcripts","Customer-initiated messages","Meta servers only","Support team",WhatsApp Business account,Y (E2E),Meta servers (US),No bulk export or deletion available — document retention policy manually
+Intercom,Support Lead,Customer support platform,"Customer name, email, support conversation history, tags","Intercom chat widget on website","None — Intercom is endpoint","Support team, Founder",Intercom login + SSO,Y,Intercom cloud (Ireland),GDPR-compliant processor — request DPA from Intercom
+Email Inbox (Gmail / Outlook),Founder,General email,"Customer names and emails in threads, any personal data sent via email","Inbound customer and vendor emails","None — internal only","Founder, relevant team member",Google/Microsoft account + 2FA,Y,Google/Microsoft cloud,HIGH RISK — unstructured personal data in email. Do not use email for sensitive data exchange.
+,,,,,,,,,,
+Add more rows above this line,,,,,,,,,,
+,,,,,,,,,,
+This is not legal advice. Consult a qualified legal professional for advice specific to your organisation.,,,,,,,,,,
+DPDP Act reference: Section 8(4) — Reasonable security safeguards to prevent personal data breach.,,,,,,,,,,

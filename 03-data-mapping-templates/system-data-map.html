@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DPDP System Data Map | Specus Labs</title>
+  <style>
+    :root {
+      --ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;
+      --white:#fff;--accent:#0f766e;--accent-light:#f0fdfa;
+      --red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+    header{background:var(--ink);color:white;padding:22px 32px;}
+    header h1{font-size:19px;font-weight:700;margin-bottom:3px;}
+    header p{font-size:12px;opacity:0.65;}
+    .meta{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:24px;flex-wrap:wrap;}
+    .mf{display:flex;flex-direction:column;gap:2px;}
+    .mf label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+    .mf input{border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;}
+    .disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:9px 32px;font-size:11px;color:var(--amber);}
+    .controls{padding:12px 32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+    .btn{padding:7px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--accent);color:white;}
+    .btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+    .search-input{padding:7px 11px;border:1px solid var(--border);border-radius:5px;font-size:12px;width:220px;}
+    .table-wrap{overflow-x:auto;padding:0 32px 32px;margin-top:20px;}
+    table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1300px;}
+    thead tr{background:var(--ink);color:white;}
+    thead th{padding:11px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;}
+    tbody tr{border-bottom:1px solid var(--border);}
+    tbody tr:hover{background:var(--accent-light);}
+    tbody td{padding:10px 12px;vertical-align:top;font-size:12px;}
+    .editable{outline:none;padding:3px 5px;border-radius:3px;display:block;min-width:100px;}
+    .editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+    .risk-high{color:var(--red);font-weight:600;}
+    .risk-med{color:var(--amber);font-weight:600;}
+    .risk-low{color:#16a34a;font-weight:600;}
+    .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:1px 5px;border-radius:3px;}
+    .del-btn:hover{color:var(--red);background:var(--red-light);}
+    .add-row-row td{padding:10px;text-align:center;}
+    .add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:7px 20px;cursor:pointer;font-size:12px;width:100%;}
+    .add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+    footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.6);padding:18px 32px;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+    footer a{color:rgba(255,255,255,.8);}
+    @media print{.controls,.del-btn,.add-row-row{display:none;}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>DPDP System Data Map</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Section 8(4) — Security safeguards | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. For advice specific to your organisation, consult a qualified legal professional.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search systems, data types…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add System</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+  <span style="margin-left:auto;font-size:10px;color:var(--muted)">Click any cell to edit</span>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>System Name</th><th>System Owner</th><th>System Type</th>
+    <th>Data Categories Held</th><th>Data Enters From</th><th>Data Exits To</th>
+    <th>Internal Access (Roles)</th><th>Authentication</th><th>Encrypted (Y/N)</th>
+    <th>Backup Location</th><th>Notes / Risk Flags</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP System Data Map — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const defaults=[
+  ["Shopify","Operations Lead","E-commerce platform","Customer name, email, phone, address, order history","Customer checkout, Meta Ads","Razorpay, Shiprocket, Klaviyo","Founder, Operations","Login + 2FA","Y","Shopify cloud (US)","PCI DSS compliant"],
+  ["Razorpay","Finance Lead","Payment gateway","Name, email, phone, tokenised card, UPI, transaction records","Shopify checkout","Razorpay internal (regulatory only)","Founder, Finance","Login + 2FA","Y","Razorpay servers (India)","RBI regulated — retention mandatory"],
+  ["Internal Database","Engineering Lead","Product database","User ID, name, email, phone, subscription, usage logs","App registration and usage","AWS RDS backups only","Engineering team","SSH key + IAM","Y (AES-256)","AWS S3 (India)","Highest risk — review access controls quarterly"],
+  ["HR Spreadsheet","Founder","Spreadsheet","Employee name, PAN, Aadhaar, bank account, salary","Employee onboarding forms","External accountant (email)","Founder, HR","Google Workspace + 2FA","N","Google Drive","HIGH RISK — contains Aadhaar and PAN. Restrict sharing immediately."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));
+let nid=rows.length+1;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');
+  tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const tr=document.createElement('tr');
+    const tn=document.createElement('td');
+    tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:11px;';
+    tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      const div=document.createElement('div');
+      div.className='editable';div.contentEditable=true;div.textContent=cell;
+      div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};
+      td.appendChild(div);tr.appendChild(td);
+    });
+    const td=document.createElement('td');
+    const btn=document.createElement('button');
+    btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove row?')){rows.splice(idx,1);render();}};
+    td.appendChild(btn);tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';
+  const at=document.createElement('td');at.colSpan=14;
+  const ab=document.createElement('button');ab.className='add-row-btn';
+  ab.textContent='+ Add a system';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(11).fill('')});render();}
+function exportCSV(){
+  const h=["System Name","System Owner","System Type","Data Categories Held","Data Enters From","Data Exits To","Internal Access","Authentication","Encrypted","Backup Location","Notes / Risk Flags"];
+  let csv='DPDP System Data Map\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='dpdp-system-data-map.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>

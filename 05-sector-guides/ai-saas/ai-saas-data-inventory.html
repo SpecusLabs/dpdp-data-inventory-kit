@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPDP Data Inventory — AI SaaS | Specus Labs</title>
+<style>
+:root{--ink:#1a1a2e;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--accent:#7c3aed;--accent-light:#f5f3ff;--red:#dc2626;--red-light:#fef2f2;--amber:#d97706;--amber-light:#fffbeb;--green:#16a34a;--green-light:#f0fdf4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;}
+header{background:var(--ink);color:white;padding:20px 28px;}
+header h1{font-size:18px;font-weight:700;margin-bottom:3px;}
+header p{font-size:11px;opacity:0.6;}
+.sector-tag{display:inline-block;background:#ede9fe;color:#4c1d95;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:6px;}
+.meta{background:var(--white);border-bottom:1px solid var(--border);padding:11px 28px;display:flex;gap:20px;flex-wrap:wrap;}
+.mf{display:flex;flex-direction:column;gap:2px;}
+.mf label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.mf input{border:1px solid var(--border);border-radius:4px;padding:3px 7px;font-size:12px;}
+.disclaimer{background:var(--amber-light);border-left:4px solid var(--amber);padding:8px 28px;font-size:11px;color:var(--amber);}
+.controls{padding:11px 28px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
+.btn{padding:6px 13px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-secondary{background:var(--bg);color:var(--ink);border:1px solid var(--border);}
+.search-input{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:11px;width:200px;}
+.table-wrap{overflow-x:auto;padding:0 28px 28px;margin-top:14px;}
+table{border-collapse:collapse;width:100%;background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:1500px;}
+thead tr{background:var(--ink);color:white;}
+thead th{padding:10px 11px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:hover{background:var(--accent-light);}
+tbody td{padding:9px 11px;vertical-align:top;font-size:11px;}
+.editable{outline:none;padding:2px 4px;border-radius:3px;display:block;min-width:90px;}
+.editable:focus{background:var(--accent-light);box-shadow:0 0 0 2px var(--accent);}
+select.risk-sel{border:1px solid var(--border);border-radius:4px;padding:2px 5px;font-size:10px;font-weight:700;}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:1px 4px;border-radius:3px;}
+.del-btn:hover{color:var(--red);background:var(--red-light);}
+.add-row-row td{padding:8px;text-align:center;}
+.add-row-btn{background:none;border:2px dashed var(--border);color:var(--muted);border-radius:5px;padding:6px 18px;cursor:pointer;font-size:11px;width:100%;}
+.add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+.priority-box{margin:16px 28px;background:var(--red-light);border:1px solid #fca5a5;border-radius:8px;padding:14px 18px;}
+.priority-box h3{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.priority-box li{font-size:11px;margin-left:16px;margin-bottom:4px;color:var(--ink);}
+.ai-note{margin:0 28px 16px;background:#f5f3ff;border:1px solid #c4b5fd;border-radius:8px;padding:12px 16px;font-size:11px;color:#4c1d95;line-height:1.6;}
+.ai-note strong{font-weight:700;}
+footer{margin-top:40px;border-top:1px solid var(--border);background:var(--ink);color:rgba(255,255,255,.55);padding:16px 28px;font-size:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+footer a{color:rgba(255,255,255,.75);}
+@media print{.controls,.del-btn,.add-row-row,.priority-box{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="sector-tag">AI SAAS</div>
+  <h1>DPDP Data Inventory — AI SaaS</h1>
+  <p>Digital Personal Data Protection Act, 2023 | Specus Labs</p>
+</header>
+<div class="meta">
+  <div class="mf"><label>Organisation</label><input id="org" type="text" placeholder="Organisation name"/></div>
+  <div class="mf"><label>Last Updated</label><input id="date" type="date"/></div>
+  <div class="mf"><label>Reviewed By</label><input id="rev" type="text" placeholder="Name / Role"/></div>
+</div>
+<div class="disclaimer">⚠️ This is not legal advice. AI SaaS businesses have unique data flows — user prompts sent to third-party APIs, inference logs, and embeddings all require careful documentation. Consult a qualified legal professional.</div>
+<div class="controls">
+  <input class="search-input" id="search" type="text" placeholder="Search systems or data types…" oninput="render()"/>
+  <button class="btn btn-primary" onclick="addRow()">+ Add System</button>
+  <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print</button>
+</div>
+<div class="ai-note">
+  <strong>AI SaaS-specific note:</strong> When users type into your product, their inputs may contain personal data. Those inputs are sent to a third-party AI API (OpenAI, Anthropic, Google, AWS Bedrock). The API provider is a Data Processor. A Data Processing Agreement is required with each provider. Inference logs storing those inputs are a personal data store — they need retention limits and deletion pipelines.
+</div>
+<div class="priority-box">
+  <h3>⚡ Priority Actions for AI SaaS Businesses</h3>
+  <ul>
+    <li>Sign DPAs with every AI API provider before handling real user data (OpenAI / Anthropic / Google / AWS)</li>
+    <li>Verify API inputs are NOT used for model training — opt out if default is opt-in</li>
+    <li>Set inference log retention to 30–90 days maximum and implement PII redaction</li>
+    <li>Include inference logs and embedding vectors in your account deletion pipeline</li>
+    <li>Audit training data for personal data before next fine-tuning run</li>
+    <li>Update privacy policy to disclose AI API providers, countries, and prompt data handling</li>
+  </ul>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th><th>System</th><th>Type</th><th>Data Categories</th><th>Data Subjects</th>
+    <th>Purpose</th><th>Legal Basis</th><th>Internal Access</th><th>Vendor / Processor</th>
+    <th>Vendor Country</th><th>Cross-Border</th><th>Security</th><th>Retention</th>
+    <th>Deletion</th><th>Risk</th><th>Children's</th><th>Notes</th><th></th>
+  </tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span>DPDP Data Inventory — AI SaaS — <a href="https://github.com/specuslabs/dpdp-data-inventory-kit">github.com/specuslabs</a> | CC BY 4.0 | This is not legal advice.</span>
+  <span>Built by <a href="https://dpdp-platform-specuslabs.up.railway.app">Specus Labs</a></span>
+</footer>
+<script>
+const RISK_IDX=14,CHILD_IDX=15;
+const defaults=[
+  ["User Auth (Auth0 / Supabase / custom)","Auth platform","Name, email, hashed password, login timestamps, OAuth tokens, plan tier","Registered users","Identity verification, session management","Consent (S.6)","Registration / OAuth","Engineering, Founder","Auth0 / Supabase / custom","USA / USA / N/A","Y","SOC 2, TLS, 2FA","Account + 30 days post-deletion","Automated deletion via account delete flow","Medium","N","Confirm auth provider has DPA. Account deletion must cascade correctly."],
+  ["Product Database (PostgreSQL / MySQL)","Product DB","User ID, email, org name, subscription plan, feature usage metadata, API key hashes, billing tier","Registered users","Product functionality, account management, subscription state","Consent (S.6)","Registration + usage","Engineering, Founder","AWS RDS / GCP Cloud SQL / MongoDB Atlas","USA or India region","Check region","AES-256, TLS, RBAC, VPC","Account + 90 days post-deletion","Automated deletion API — verify all related tables cascade","High","N","Confirm region. Use Mumbai (ap-south-1) to avoid cross-border. Restrict DB access to 2–3 engineers."],
+  ["AI API — Prompt Inputs (OpenAI / Anthropic / Google / AWS Bedrock)","AI model API","User prompt text (may contain personal data), conversation context, system prompts, model parameters","Registered users (and their customers)","AI model inference — generating product outputs","Consent (S.6)","Generated by users, sent to API in real time","Engineering (API config only)","OpenAI / Anthropic / Google / AWS","USA","Y","TLS in transit, API key auth, training opt-out (verify)","Not stored by API after inference (verify per provider)","Prompts not retained — verify. Request deletion if in doubt.","High","N","CRITICAL: DPA required with every provider. Verify no training on API inputs. Disclose provider and country in privacy policy."],
+  ["Inference Logs (CloudWatch / Datadog / custom)","Log management","User ID, session ID, timestamp, prompt text, model response, latency, error codes, token counts","Registered users","Debugging, monitoring, abuse detection, quality review","Legitimate use — internal ops","Auto-generated during inference","Engineering, Founder","AWS CloudWatch / Datadog / custom","USA or India","Depends","IAM access, log encryption, retention policy enforced","30–90 days maximum — mandatory","Auto-expiry policy. Manual deletion pipeline on account delete.","High","N","HIGHEST RISK ROW. Set mandatory retention limits now. Redact PII from logs before storage. Delete when user account is deleted."],
+  ["Embedding Vector Store (Pinecone / Weaviate / pgvector)","Vector DB","Embedding vectors from user docs or prompts, metadata (user ID, doc ID, chunk ID, filename)","Registered users (and their doc subjects)","Semantic search, RAG, context retrieval","Consent (S.6)","Generated from user-uploaded documents or history","Engineering","Pinecone / Weaviate / same DB (pgvector)","USA / Netherlands / same region","Y (Pinecone/Weaviate) / Check (pgvector)","TLS, API key, namespace isolation per user","Account lifetime — delete on account deletion or erasure","Delete by user namespace or user ID filter in deletion pipeline","High","N","Treat embeddings as personal data. Disclosure in privacy policy. Must delete on erasure request."],
+  ["Training Data Store (if fine-tuning used)","Cloud storage","Text samples — may include user-generated content, third-party data, or proprietary data","Users who generated training data (if applicable)","Model fine-tuning, capability improvement","Consent (S.6) — only if user inputs used","Engineering, ML team","AWS S3 / GCP Storage / Azure Blob","India or USA","Depends","Bucket encryption, IAM, no public access","Duration of model usage — review on model deprecation","Delete from bucket. Consult legal if model weights encode personal data.","High","N","Audit training data for personal data. If user inputs used without consent — rebuild dataset or obtain retroactive consent."],
+  ["Analytics (Mixpanel / Amplitude / PostHog)","Product analytics","User ID, session events, feature interactions, plan type — NO prompt text","Registered users","Product analytics, funnel analysis, growth metrics","Consent (S.6) / Legitimate use","Analytics SDK auto-collection","Product, Growth, Founder","Mixpanel / Amplitude / PostHog","USA / USA / USA or self-hosted","Y (cloud) / Y / Depends","SOC 2, TLS, data minimisation","24 months or until account deletion","Delete user via analytics API — include in deletion pipeline","Medium","N","Ensure prompt text is NEVER in analytics events. Review event schema for accidental PII leakage."],
+  ["Billing (Stripe / Razorpay / Chargebee)","Billing platform","Name, email, billing address, payment method (tokenised), subscription, invoice history","Paying customers","Subscription billing, payment processing, invoicing","Consent (S.6)","Collected at first payment","Founder, Finance","Stripe / Razorpay / Chargebee","USA / India / USA","Y (Stripe/Chargebee) / N (Razorpay)","PCI DSS, TLS, tokenisation","Subscription + 7 years (statutory)","Statutory retention — anonymise non-statutory fields on account delete","Medium","N","DPA from Stripe and Chargebee. Statutory retention prevents full deletion of invoices."],
+  ["Customer Support (Intercom / Freshdesk)","Support platform","Name, email, support conversation history, subscription context","Registered users","Customer support, bug reports, feature requests","Consent (S.6)","User-initiated support contact","Support, Founder","Intercom / Freshworks","Ireland / India","Y (Intercom) / N (Freshworks)","SOC 2, TLS","2 years from resolution","Delete contact via platform dashboard — include in deletion pipeline","Low","N","Do not store AI output content in support tickets. DPA available from both providers."],
+  ["HR System / Payroll","HR / payroll tool","Employee name, email, PAN, bank account, salary, equity, offer letter","Employees, contractors","Payroll, HR, statutory compliance","Contractual / Legal obligation","Collected from employees at onboarding","Founder, HR","Payroll software / accountant","India","N","Software encryption, access to 1–2 people only","Employment + 5 years (statutory)","Manual deletion after statutory period","High","N","Keep separate from product infrastructure. Use dedicated payroll tool, not spreadsheets."],
+];
+let rows=defaults.map((c,i)=>({id:i+1,cells:[...c]}));let nid=rows.length+1;
+function render(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  rows.forEach((row,idx)=>{
+    if(q&&!row.cells.some(c=>c.toLowerCase().includes(q)))return;
+    const tr=document.createElement('tr');
+    const tn=document.createElement('td');tn.textContent=idx+1;tn.style.cssText='color:var(--muted);font-size:10px;';tr.appendChild(tn);
+    row.cells.forEach((cell,ci)=>{
+      const td=document.createElement('td');
+      if(ci===RISK_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['Low','Medium','High'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else if(ci===CHILD_IDX){
+        const sel=document.createElement('select');sel.className='risk-sel';
+        ['N','Y','Possible'].forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(cell===o)op.selected=true;sel.appendChild(op);});
+        sel.onchange=()=>{rows[idx].cells[ci]=sel.value;};td.appendChild(sel);
+      } else {
+        const div=document.createElement('div');div.className='editable';div.contentEditable=true;div.textContent=cell;div.oninput=()=>{rows[idx].cells[ci]=div.textContent;};td.appendChild(div);
+      }
+      tr.appendChild(td);
+    });
+    const td=document.createElement('td');const btn=document.createElement('button');btn.className='del-btn';btn.textContent='×';
+    btn.onclick=()=>{if(confirm('Remove row?')){rows.splice(idx,1);render();}};td.appendChild(btn);tr.appendChild(td);tb.appendChild(tr);
+  });
+  const ar=document.createElement('tr');ar.className='add-row-row';const at=document.createElement('td');at.colSpan=19;
+  const ab=document.createElement('button');ab.className='add-row-btn';ab.textContent='+ Add system';ab.onclick=addRow;at.appendChild(ab);ar.appendChild(at);tb.appendChild(ar);
+}
+function addRow(){rows.push({id:nid++,cells:Array(17).fill('')});render();}
+function exportCSV(){
+  const h=["System","Type","Data Categories","Data Subjects","Purpose","Legal Basis","Internal Access","Vendor","Vendor Country","Cross-Border","Security","Retention","Deletion","Risk","Children's","Notes"];
+  let csv='DPDP Data Inventory — AI SaaS\nThis is not legal advice.\n\n'+h.map(x=>`"${x}"`).join(',')+'\n';
+  rows.forEach(r=>{csv+=r.cells.map(c=>`"${(c||'').replace(/"/g,'""')}"`).join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='dpdp-ai-saas-data-inventory.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('date').value=new Date().toISOString().split('T')[0];render();});
+</script>
+</body>
+</html>
